@@ -1,16 +1,49 @@
-# This is a sample Python script.
+import heapq
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+maze = [
+    [0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 0],
+    [0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1, 0]
+]
 
+start = (0, 0)
+goal = (4, 5)
+rows, cols = len(maze), len(maze[0])
+moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
+def valid(pos):
+    r, c = pos
+    return 0 <= r < rows and 0 <= c < cols and maze[r][c] == 0
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def a_star(start, goal):
+    open_set = []
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    manhattan_distance = heuristic(start, goal)
+    print("Result from Manhattan distance heuristic:", manhattan_distance)
+
+    heapq.heappush(open_set, (0 + manhattan_distance, 0, start, [start]))
+    visited = set()
+
+    while open_set:
+        f, g, current, path = heapq.heappop(open_set)
+        if current == goal:
+            return path
+
+        if current in visited:
+            continue
+        visited.add(current)
+
+        for move in moves:
+            neighbor = (current[0] + move[0], current[1] + move[1])
+            if valid(neighbor) and neighbor not in visited:
+                heapq.heappush(open_set, (g + 1 + heuristic(neighbor, goal), g + 1, neighbor, path + [neighbor]))
+
+    return None
+
+path = a_star(start, goal)
+print("Path found:", path)
